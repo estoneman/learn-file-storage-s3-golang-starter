@@ -41,7 +41,7 @@ func (cfg *apiConfig) handlerUploadThumbnail(w http.ResponseWriter, r *http.Requ
 
 	file, header, err := r.FormFile("thumbnail")
 	if err != nil {
-		respondWithError(w, http.StatusBadRequest, "thumbnail not found", err)
+		respondWithError(w, http.StatusBadRequest, "thumbnail not found in request", err)
 		return
 	}
 	defer file.Close()
@@ -52,8 +52,8 @@ func (cfg *apiConfig) handlerUploadThumbnail(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	if !(contentType == "image/jpeg" || contentType == "image/png") {
-		respondWithError(w, http.StatusBadRequest, "bad Content-Type", err)
+	if contentType != "image/jpeg" && contentType != "image/png" {
+		respondWithError(w, http.StatusUnsupportedMediaType, "bad Content-Type", err)
 		return
 	}
 
@@ -76,7 +76,7 @@ func (cfg *apiConfig) handlerUploadThumbnail(w http.ResponseWriter, r *http.Requ
 
 	fileExt := strings.Split(contentType, "/")[1]
 
-	randBytesSize := 2 << 5
+	randBytesSize := 2 << 4
 	randBytes := make([]byte, randBytesSize)
 
 	bytesRead, err := rand.Read(randBytes)
